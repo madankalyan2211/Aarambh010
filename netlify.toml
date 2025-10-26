@@ -1,12 +1,24 @@
 [build]
   command = "npm run build"
-  publish = "build"
+  publish = "dist"
   base = "/"
+
+[build.environment]
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[template.environment]
+  VITE_FIREBASE_API_KEY = "Your Firebase API Key"
+  VITE_FIREBASE_AUTH_DOMAIN = "Your Firebase Auth Domain"
+  VITE_FIREBASE_PROJECT_ID = "Your Firebase Project ID"
+  VITE_FIREBASE_STORAGE_BUCKET = "Your Firebase Storage Bucket"
+  VITE_FIREBASE_MESSAGING_SENDER_ID = "Your Firebase Messaging Sender ID"
+  VITE_FIREBASE_APP_ID = "Your Firebase App ID"
+  VITE_API_BASE_URL = "Your Backend API Base URL"
 
 # Proxy API requests to your Render backend
 [[redirects]]

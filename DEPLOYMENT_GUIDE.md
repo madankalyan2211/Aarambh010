@@ -1,6 +1,6 @@
 # Aarambh LMS Deployment Guide
 
-This guide provides instructions for deploying the Aarambh Learning Management System to Render (backend) and AWS Amplify (frontend) using Git-based deployment.
+This guide provides instructions for deploying the Aarambh Learning Management System to Render (backend) and Netlify (frontend) using Git-based deployment.
 
 ## Prerequisites
 
@@ -9,7 +9,7 @@ This guide provides instructions for deploying the Aarambh Learning Management S
 3. Git
 4. GitHub account
 5. Render account (for backend deployment)
-6. AWS account (for frontend deployment)
+6. Netlify account (for frontend deployment)
 
 ## Backend Deployment to Render (Git-based)
 
@@ -60,7 +60,7 @@ FIREBASE_CLIENT_X509_CERT_URL=your_firebase_client_x509_cert_url_here
 
 After deployment, update your MongoDB Atlas IP whitelist to include Render's IP addresses.
 
-## Frontend Deployment to AWS Amplify (Git-based)
+## Frontend Deployment to Netlify (Git-based)
 
 ### 1. Configure Environment Variables
 
@@ -71,31 +71,28 @@ Update the `.env.production` file with your production configuration:
 VITE_API_BASE_URL=https://your-render-backend-url.onrender.com/api
 
 # Application Configuration
-VITE_APP_URL=https://your-aws-amplify-url.amazonaws.com
+VITE_APP_URL=https://your-netlify-url.netlify.app
 ```
 
-### 2. Deploy to AWS Amplify via Git
+### 2. Deploy to Netlify via Git
 
-1. Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify/home)
-2. Click "New app" -> "Host web app"
-3. Connect your Git repository provider (GitHub)
+1. Go to [Netlify Dashboard](https://app.netlify.com)
+2. Click "Add new site" -> "Import an existing project"
+3. Connect your Git provider (GitHub)
 4. Select your repository: `madankalyan2211/Aarambh010`
-5. Configure build settings:
-   - **App name**: `aarambh-frontend`
-   - **Branch**: `main`
-   - **Build settings**:
-     - Base directory: `/` (root)
-     - Build command: `npm run build`
-     - Artifact directory: `dist`
+5. Configure deployment settings:
+   - **Branch to deploy**: `main`
+   - **Build command**: `npm run build`
+   - **Publish directory**: `dist`
 6. Add environment variables from `.env.production`
-7. Click "Save and deploy"
+7. Click "Deploy site"
 
 ### 3. Custom Domain (Optional)
 
-After deployment, you can configure a custom domain in the AWS Amplify console:
-1. Go to your app in the Amplify console
-2. Click "Domain management"
-3. Click "Add domain"
+After deployment, you can configure a custom domain in the Netlify console:
+1. Go to your site in the Netlify dashboard
+2. Click "Domain settings"
+3. Click "Add custom domain"
 4. Follow the instructions to add your custom domain
 
 ## Environment Configuration
@@ -141,7 +138,7 @@ After deployment, you can configure a custom domain in the AWS Amplify console:
 ### Logs and Monitoring
 
 - Render: Check logs in the Render dashboard
-- AWS Amplify: Check logs in the Amplify console
+- Netlify: Check logs in the Netlify dashboard
 - Application: Enable debug logging by setting `DEBUG=*` environment variable
 
 ## Security Considerations
@@ -156,7 +153,7 @@ After deployment, you can configure a custom domain in the AWS Amplify console:
 ## Scaling Considerations
 
 1. **Render**: Upgrade to a paid plan for better performance and reliability
-2. **AWS Amplify**: Consider using CloudFront for global content delivery
+2. **Netlify**: Consider using Netlify's pro plan for better performance
 3. **MongoDB**: Use a dedicated cluster for production workloads
 4. **Email**: Consider using a dedicated email service like SendGrid or AWS SES for production
 
@@ -166,4 +163,4 @@ After deployment, you can configure a custom domain in the AWS Amplify console:
 2. Monitor application logs for errors
 3. Update dependencies regularly
 4. Review and rotate API keys and secrets periodically
-5. Monitor usage and costs on Render and AWS
+5. Monitor usage and costs on Render and Netlify
