@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Upload Button Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .upload-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .header label {
+            margin-bottom: 0;
+            font-weight: 600;
+        }
+        
+        .max-size {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .progress-container {
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background-color: #007bff;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .upload-button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .upload-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            text-align: center;
+            border: none;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        
+        .upload-button:hover {
+            background-color: #0056b3;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .status {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .uploaded-video {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .uploaded-video-header {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .video-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .notes {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .notes-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .notes-list {
+            padding-left: 20px;
+            margin: 0;
+        }
+        
+        .notes-list li {
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Video Upload Button Test</h1>
+        
+        <div class="form-group">
+            <label for="lesson-type">Lesson Type</label>
+            <select id="lesson-type">
+                <option value="text">Text</option>
+                <option value="video" selected>Video</option>
+                <option value="pdf">PDF</option>
+            </select>
+        </div>
+        
+        <div class="upload-container">
+            <div class="header">
+                <label for="video-upload">Upload Video File</label>
+                <span class="max-size">Max 100MB</span>
+            </div>
+            
+            <p class="description">
+                Select a video file from your computer to upload directly to the lesson.
+            </p>
+            
+            <div class="upload-button-container">
+                <input type="file" id="video-upload" class="file-input" accept="video/*">
+                <label for="video-upload" class="upload-button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Select Video from Computer
+                </label>
+                <p class="status" id="status">No file chosen</p>
+            </div>
+            
+            <div class="notes">
+                <p class="notes-header">Note:</p>
+                <ul class="notes-list">
+                    <li>Supported formats: MP4, MOV, AVI, WMV, FLV</li>
+                    <li>Maximum file size: 100MB</li>
+                    <li>Save the lesson after uploading to make it available to students</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('video-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const status = document.getElementById('status');
+            
+            if (file) {
+                status.textContent = '✓ Video selected: ' + file.name;
+                status.className = 'status success';
+            } else {
+                status.textContent = 'No file chosen';
+                status.className = 'status';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+From 55fbb20eb09c51fd4d3d1f902193029ded42233d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E2=80=9Cmadankalyan2211=E2=80=9D?=
+ <“hello2madan@gmail.com”>
+Date: Sat, 18 Oct 2025 09:51:20 +0530
+Subject: [PATCH 1/7] Fix API requests to use environment variables in
+ production
+
+---
+ src/services/api.service.ts | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/src/services/api.service.ts b/src/services/api.service.ts
+index 196fed0..c0d2a52 100644
+--- a/src/services/api.service.ts
++++ b/src/services/api.service.ts
+@@ -2,11 +2,12 @@
+  * API Service for backend communication
+  */
+ 
+-// Always use relative URLs that will be proxied by Vercel
+-// This works in both development (with Vite proxy) and production (with Vercel proxy)
+-const API_BASE_URL = '';
++import { env } from '../config/env';
+ 
+-console.log('🔧 Using relative URLs for API requests');
++// Use the API base URL from environment variables, fallback to relative URLs
++const API_BASE_URL = env.apiBaseUrl || '';
++
++console.log('🔧 Using API base URL:', API_BASE_URL || 'relative URLs');
+ 
+ interface ApiResponse<T = any> {
+   success: boolean;
+@@ -28,10 +29,10 @@ export const apiRequest = async <T = any>(
+       ...options.headers,
+     };
+     
+-    // Construct the full URL using relative URLs that will be proxied
+-    // In development: Vite proxies /api/* to http://localhost:3001/api/*
+-    // In production: Vercel proxies /api/* to https://aarambh01-m6cx.onrender.com/api/*
+-    const fullUrl = `/api${endpoint}`;
++    // Construct the full URL
++    // In production: Use the full API URL from environment variables
++    // In development: Use relative URLs that will be proxied
++    const fullUrl = API_BASE_URL ? `${API_BASE_URL}${endpoint}` : `/api${endpoint}`;
+     
+     console.log('🚀 API Request:', {
+       endpoint,
+-- 
+2.50.1 (Apple Git-155)
+

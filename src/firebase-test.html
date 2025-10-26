@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Test</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <h1>Firebase Configuration Test</h1>
+    <div id="result"></div>
+
+    <script>
+        // Firebase configuration from environment variables
+        const firebaseConfig = {
+            apiKey: "AIzaSyBtXkaDTPPlyJ7ZuuPapoa0uzFNjpAzYfs",
+            authDomain: "aarambh-01.firebaseapp.com",
+            projectId: "aarambh-01",
+            storageBucket: "aarambh-01.firebasestorage.app",
+            messagingSenderId: "355710714207",
+            appId: "1:355710714207:web:4efbd99f1358343a36b6ea"
+        };
+
+        try {
+            // Initialize Firebase
+            const app = firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            
+            document.getElementById('result').innerHTML = `
+                <p style="color: green;">✅ Firebase initialized successfully!</p>
+                <p>Project ID: ${firebaseConfig.projectId}</p>
+                <p>App ID: ${firebaseConfig.appId}</p>
+            `;
+            
+            // Try to get auth instance
+            console.log('Firebase Auth Instance:', auth);
+        } catch (error) {
+            document.getElementById('result').innerHTML = `
+                <p style="color: red;">❌ Firebase initialization failed:</p>
+                <p>Error: ${error.message}</p>
+            `;
+            console.error('Firebase initialization error:', error);
+        }
+    </script>
+</body>
+</html>

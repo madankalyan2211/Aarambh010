@@ -1,0 +1,7 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pink background -->
+  <rect width="32" height="32" rx="6" fill="#FF69B4"/>
+  
+  <!-- Letter 'A' for Aarambh in white -->
+  <path d="M16 6L24 26H21L19.25 21.5H12.75L11 26H8L16 6ZM16 11L13.5 18H18.5L16 11Z" fill="white" stroke="white" stroke-width="0.5"/>
+</svg>

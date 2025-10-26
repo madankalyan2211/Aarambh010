@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEE THE BUTTON - Video Upload</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        
+        .button-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 2px dashed #007bff;
+        }
+        
+        .button-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .url-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .upload-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .upload-button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+        
+        .upload-button:active {
+            transform: translateY(0);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .instructions {
+            background: #e9f7fe;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .instructions h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .steps {
+            list-style: none;
+        }
+        
+        .steps li {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .steps li:before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #007bff;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .note {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .note strong {
+            color: #856404;
+        }
+        
+        .cta {
+            margin-top: 30px;
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .emoji {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="emoji">🎉</span>
+        <h1>SEE THE BUTTON!</h1>
+        <p class="subtitle">This is exactly what you're looking for</p>
+        
+        <div class="button-container">
+            <span class="button-label">Video URL Input with Upload Button</span>
+            <div class="input-group">
+                <input type="text" class="url-input" placeholder="Enter YouTube or Vimeo URL">
+                <input type="file" class="file-input" accept="video/*" id="video-upload">
+                <label for="video-upload" class="upload-button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Upload Video
+                </label>
+            </div>
+            <p style="color: #28a745; font-weight: 600; margin-top: 10px;">✓ This is the button you're looking for!</p>
+        </div>
+        
+        <div class="note">
+            <strong>Important:</strong> In the actual application, this button only appears when you:
+            <ol style="margin-top: 10px; padding-left: 20px;">
+                <li>Log in as a <span class="highlight">teacher</span></li>
+                <li>Go to <span class="highlight">Manage Course</span></li>
+                <li>Add or edit a lesson</li>
+                <li>Select <span class="highlight">"Video"</span> from the Lesson Type dropdown</li>
+            </ol>
+        </div>
+        
+        <div class="instructions">
+            <h2>How to Find It in the App</h2>
+            <ol class="steps">
+                <li data-step="1">Log in to the application at <strong>http://localhost:5177</strong></li>
+                <li data-step="2">Click on <span class="highlight">Courses</span> tab</li>
+                <li data-step="3">Find a course you're teaching and click <span class="highlight">Manage Course</span></li>
+                <li data-step="4">Add a new lesson or edit an existing one</li>
+                <li data-step="5">Change <span class="highlight">Lesson Type</span> to <span class="highlight">Video</span></li>
+                <li data-step="6"><strong>THE BUTTON APPEARS HERE!</strong> 🎉</li>
+            </ol>
+        </div>
+        
+        <p class="cta">Now you know what to look for! 👀</p>
+    </div>
+</body>
+</html>

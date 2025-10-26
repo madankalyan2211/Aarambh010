@@ -1,0 +1,25 @@
+{
+  "Routes": [
+    {
+      "Source": "/api/*",
+      "Target": "https://aarambh-production.eba-hmkpyyve.us-east-1.elasticbeanstalk.com/api/:splat",
+      "Status": "200"
+    },
+    {
+      "Source": "/assets/*",
+      "Target": "/assets/:splat",
+      "Status": "200"
+    },
+    {
+      "Source": "/<*>",
+      "Target": "/index.html",
+      "Status": "200"
+    }
+  ],
+  "ErrorPages": [
+    {
+      "ErrorCode": "404",
+      "Path": "/index.html"
+    }
+  ]
+}

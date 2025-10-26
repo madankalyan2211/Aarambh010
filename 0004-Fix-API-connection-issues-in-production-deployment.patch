@@ -1,0 +1,335 @@
+From a7e88623476e0513ab5d30767ee97e59ab0399c7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E2=80=9Cmadankalyan2211=E2=80=9D?=
+ <“hello2madan@gmail.com”>
+Date: Sat, 18 Oct 2025 11:40:46 +0530
+Subject: [PATCH 4/7] Fix API connection issues in production deployment
+
+- Enhanced API service with better error handling and validation
+- Improved environment variable loading and debugging
+- Added validation for production API configuration
+- Updated deployment script with explicit environment variables
+- Added .env.amplify to .gitignore for security
+- Improved startup validation in main.tsx
+---
+ .gitignore                  |  1 +
+ deploy-frontend.sh          | 30 ++++++++++++++
+ package.json                |  1 +
+ src/config/env.ts           | 15 +++++--
+ src/main.tsx                | 35 +++++++++++-----
+ src/services/api.service.ts | 80 ++++++++++++++++++++++++++++++++++++-
+ 6 files changed, 147 insertions(+), 15 deletions(-)
+ create mode 100755 deploy-frontend.sh
+
+diff --git a/.gitignore b/.gitignore
+index b99f880..c4c778f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -3,6 +3,7 @@
+ .env.local
+ .env.*.local
+ .env.production
++.env.amplify
+ server/.env
+ server/.env.production
+ 
+diff --git a/deploy-frontend.sh b/deploy-frontend.sh
+new file mode 100755
+index 0000000..db0db2d
+--- /dev/null
++++ b/deploy-frontend.sh
+@@ -0,0 +1,30 @@
++#!/bin/bash
++
++echo "=== Aarambh Frontend Deployment Script ==="
++
++# Set environment variables for production build
++export VITE_API_BASE_URL="https://aarambh-production.eba-hmkpyyve.us-east-1.elasticbeanstalk.com/api"
++export VITE_WS_BASE_URL="wss://aarambh-production.eba-hmkpyyve.us-east-1.elasticbeanstalk.com"
++export VITE_APP_ENV="production"
++export VITE_DEBUG_MODE="false"
++export VITE_APP_URL="https://main.dr5r9xxdzd1cq.amplifyapp.com"
++
++# Build the project with environment variables
++echo "Building frontend with production environment variables..."
++npm run build
++
++# Create deployment package
++echo "Creating deployment package..."
++rm -f aarambh-frontend-deploy.zip
++zip -r aarambh-frontend-deploy.zip build
++
++echo "Deployment package created: aarambh-frontend-deploy.zip"
++echo ""
++echo "NEXT STEPS:"
++echo "1. Go to AWS Amplify Console: https://console.aws.amazon.com/amplify/"
++echo "2. Select your app (ID: dr5r9xxdzd1cq)"
++echo "3. Click 'Deploy' or 'Manual deploy'"
++echo "4. Upload the file: aarambh-frontend-deploy.zip"
++echo "5. Click 'Save and deploy'"
++echo ""
++echo "Deployment package is ready for manual upload to AWS Amplify."
+\ No newline at end of file
+diff --git a/package.json b/package.json
+index 6eebf59..d07bb07 100644
+--- a/package.json
++++ b/package.json
+@@ -56,6 +56,7 @@
+       },
+       "devDependencies": {
+             "@types/node": "^20.10.0",
++            "@types/react-dom": "^19.2.2",
+             "@vitejs/plugin-react-swc": "^3.10.2",
+             "typescript": "^5.9.3",
+             "vite": "6.3.5"
+diff --git a/src/config/env.ts b/src/config/env.ts
+index cd39584..1f7393d 100644
+--- a/src/config/env.ts
++++ b/src/config/env.ts
+@@ -64,14 +64,14 @@ interface EnvConfig {
+  * Get environment variable with fallback
+  */
+ const getEnv = (key: string, defaultValue: string = ''): string => {
+-  return import.meta.env[key] || defaultValue;
++  return (import.meta as any).env[key] || defaultValue;
+ };
+ 
+ /**
+  * Get boolean environment variable
+  */
+ const getEnvBoolean = (key: string, defaultValue: boolean = false): boolean => {
+-  const value = import.meta.env[key];
++  const value = (import.meta as any).env[key];
+   if (value === undefined || value === null) return defaultValue;
+   return value === 'true' || value === true;
+ };
+@@ -80,7 +80,7 @@ const getEnvBoolean = (key: string, defaultValue: boolean = false): boolean => {
+  * Get number environment variable
+  */
+ const getEnvNumber = (key: string, defaultValue: number = 0): number => {
+-  const value = import.meta.env[key];
++  const value = (import.meta as any).env[key];
+   if (value === undefined || value === null) return defaultValue;
+   const parsed = parseInt(value, 10);
+   return isNaN(parsed) ? defaultValue : parsed;
+@@ -146,6 +146,13 @@ export const env: EnvConfig = {
+   enable2FA: getEnvBoolean('VITE_ENABLE_2FA', true),
+ };
+ 
++// Log environment configuration for debugging
++console.log('🔧 Environment Configuration Loaded:', {
++  apiBaseUrl: env.apiBaseUrl,
++  appEnv: env.appEnv,
++  debugMode: env.debugMode,
++});
++
+ /**
+  * Validate required environment variables
+  */
+@@ -209,4 +216,4 @@ export const logEnvConfig = (): void => {
+   }
+ };
+ 
+-export default env;
++export default env;
+\ No newline at end of file
+diff --git a/src/main.tsx b/src/main.tsx
+index 50cfb6d..690feb5 100644
+--- a/src/main.tsx
++++ b/src/main.tsx
+@@ -1,12 +1,27 @@
+-import { createRoot } from "react-dom/client";
+-import App from "./App.tsx";
+-import "./index.css";
++import React from 'react';
++import ReactDOM from 'react-dom/client';
++import App from './App';
++import './index.css';
++import { env } from './config/env';
+ 
+-const rootElement = document.getElementById("root");
+-if (!rootElement) {
+-  console.error('Failed to find root element');
+-} else {  
+-  createRoot(rootElement).render(<App />);
+-  console.log('App mounted successfully');
++// Log environment configuration at startup
++console.log('🚀 Aarambh LMS Frontend Starting...');
++console.log('🔧 Environment Configuration:', env);
++
++// Check if API base URL is properly configured
++if (!env.apiBaseUrl || env.apiBaseUrl === 'http://localhost:31001/api') {
++  console.warn('⚠️  API Base URL might not be properly configured for production!');
++  console.warn('🔧 Current API Base URL:', env.apiBaseUrl);
++  
++  // In production, this should be a warning
++  if (env.appEnv === 'production') {
++    console.error('❌ CRITICAL: API Base URL is not configured for production environment!');
++    console.error('🔧 Please check your environment variables configuration.');
++  }
+ }
+-  
+\ No newline at end of file
++
++ReactDOM.createRoot(document.getElementById('root')!).render(
++  <React.StrictMode>
++    <App />
++  </React.StrictMode>,
++);
+\ No newline at end of file
+diff --git a/src/services/api.service.ts b/src/services/api.service.ts
+index c0d2a52..76ec897 100644
+--- a/src/services/api.service.ts
++++ b/src/services/api.service.ts
+@@ -8,6 +8,20 @@ import { env } from '../config/env';
+ const API_BASE_URL = env.apiBaseUrl || '';
+ 
+ console.log('🔧 Using API base URL:', API_BASE_URL || 'relative URLs');
++console.log('🔧 Environment config:', {
++  apiBaseUrl: env.apiBaseUrl,
++  appEnv: env.appEnv,
++  debugMode: env.debugMode,
++});
++
++// Ensure the API_BASE_URL ends with /api for consistency
++const normalizedApiBaseUrl = API_BASE_URL ? API_BASE_URL.replace(/\/$/, '') : '';
++
++// Validate that we have a proper API base URL in production
++if (env.appEnv === 'production' && (!API_BASE_URL || API_BASE_URL === 'http://localhost:31001/api')) {
++  console.error('❌ CRITICAL: API Base URL is not properly configured for production environment!');
++  console.error('🔧 Current API Base URL:', API_BASE_URL);
++}
+ 
+ interface ApiResponse<T = any> {
+   success: boolean;
+@@ -32,7 +46,7 @@ export const apiRequest = async <T = any>(
+     // Construct the full URL
+     // In production: Use the full API URL from environment variables
+     // In development: Use relative URLs that will be proxied
+-    const fullUrl = API_BASE_URL ? `${API_BASE_URL}${endpoint}` : `/api${endpoint}`;
++    const fullUrl = normalizedApiBaseUrl ? `${normalizedApiBaseUrl}${endpoint}` : `/api${endpoint}`;
+     
+     console.log('🚀 API Request:', {
+       endpoint,
+@@ -60,6 +74,11 @@ export const apiRequest = async <T = any>(
+       throw new Error('Too many requests from this IP, please try again later.');
+     }
+     
++    // Check if we received HTML (which means we're getting the frontend app instead of API response)
++    if (responseText.trim().startsWith('<!DOCTYPE html>')) {
++      throw new Error(`Received HTML response instead of API response. Check if API URL is correct. Requested: ${fullUrl}`);
++    }
++    
+     // Try to parse JSON
+     let data;
+     try {
+@@ -94,6 +113,9 @@ export const apiRequest = async <T = any>(
+       if (error.message.includes('Too many requests') || error.message.includes('rate limit')) {
+         errorMessage = 'Too many requests from this IP, please try again later.';
+         errorDetail = 'Rate limit exceeded. Please wait a few minutes before trying again.';
++      } else if (error.message.includes('Received HTML response')) {
++        errorMessage = 'API connection error';
++        errorDetail = 'The frontend is not properly connected to the backend API. Please check the API configuration.';
+       } else {
+         try {
+           const errorDetails = JSON.parse(error.message);
+@@ -119,6 +141,15 @@ export const apiRequest = async <T = any>(
+  * Send OTP to email
+  */
+ export const sendOTP = async (email: string, name?: string): Promise<ApiResponse> => {
++  // Validate API configuration before making request
++  if (env.appEnv === 'production' && (!normalizedApiBaseUrl || normalizedApiBaseUrl === 'http://localhost:31001/api')) {
++    return {
++      success: false,
++      message: 'API not properly configured',
++      error: 'The application is not properly configured to connect to the backend API. Please contact support.',
++    };
++  }
++  
+   return apiRequest('/auth/send-otp', {
+     method: 'POST',
+     body: JSON.stringify({ email, name }),
+@@ -129,6 +160,15 @@ export const sendOTP = async (email: string, name?: string): Promise<ApiResponse
+  * Verify OTP
+  */
+ export const verifyOTP = async (email: string, otp: string): Promise<ApiResponse> => {
++  // Validate API configuration before making request
++  if (env.appEnv === 'production' && (!normalizedApiBaseUrl || normalizedApiBaseUrl === 'http://localhost:31001/api')) {
++    return {
++      success: false,
++      message: 'API not properly configured',
++      error: 'The application is not properly configured to connect to the backend API. Please contact support.',
++    };
++  }
++  
+   return apiRequest('/auth/verify-otp', {
+     method: 'POST',
+     body: JSON.stringify({ email, otp }),
+@@ -139,6 +179,15 @@ export const verifyOTP = async (email: string, otp: string): Promise<ApiResponse
+  * Resend OTP
+  */
+ export const resendOTP = async (email: string, name?: string): Promise<ApiResponse> => {
++  // Validate API configuration before making request
++  if (env.appEnv === 'production' && (!normalizedApiBaseUrl || normalizedApiBaseUrl === 'http://localhost:31001/api')) {
++    return {
++      success: false,
++      message: 'API not properly configured',
++      error: 'The application is not properly configured to connect to the backend API. Please contact support.',
++    };
++  }
++  
+   return apiRequest('/auth/resend-otp', {
+     method: 'POST',
+     body: JSON.stringify({ email, name }),
+@@ -149,6 +198,15 @@ export const resendOTP = async (email: string, name?: string): Promise<ApiRespon
+  * Send welcome email
+  */
+ export const sendWelcomeEmail = async (email: string, name: string): Promise<ApiResponse> => {
++  // Validate API configuration before making request
++  if (env.appEnv === 'production' && (!normalizedApiBaseUrl || normalizedApiBaseUrl === 'http://localhost:31001/api')) {
++    return {
++      success: false,
++      message: 'API not properly configured',
++      error: 'The application is not properly configured to connect to the backend API. Please contact support.',
++    };
++  }
++  
+   return apiRequest('/auth/send-welcome', {
+     method: 'POST',
+     body: JSON.stringify({ email, name }),
+@@ -160,6 +218,16 @@ export const sendWelcomeEmail = async (email: string, name: string): Promise<Api
+  */
+ export const getCurrentUser = async (): Promise<ApiResponse> => {
+   const token = localStorage.getItem('authToken');
++  
++  // Validate API configuration before making request
++  if (env.appEnv === 'production' && (!normalizedApiBaseUrl || normalizedApiBaseUrl === 'http://localhost:31001/api')) {
++    return {
++      success: false,
++      message: 'API not properly configured',
++      error: 'The application is not properly configured to connect to the backend API. Please contact support.',
++    };
++  }
++  
+   return apiRequest('/auth/me', {
+     method: 'GET',
+     headers: {
+@@ -173,6 +241,16 @@ export const getCurrentUser = async (): Promise<ApiResponse> => {
+  */
+ export const searchUsers = async (query: string): Promise<ApiResponse> => {
+   const token = localStorage.getItem('authToken');
++  
++  // Validate API configuration before making request
++  if (env.appEnv === 'production' && (!normalizedApiBaseUrl || normalizedApiBaseUrl === 'http://localhost:31001/api')) {
++    return {
++      success: false,
++      message: 'API not properly configured',
++      error: 'The application is not properly configured to connect to the backend API. Please contact support.',
++    };
++  }
++  
+   return apiRequest(`/users/search?query=${encodeURIComponent(query)}`, {
+     method: 'GET',
+     headers: {
+-- 
+2.50.1 (Apple Git-155)
+

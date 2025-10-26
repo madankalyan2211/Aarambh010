@@ -1,0 +1,15 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pink gradient background circle -->
+  <circle cx="32" cy="32" r="32" fill="url(#pinkGradient)"/>
+  
+  <!-- Letter 'A' for Aarambh -->
+  <path d="M32 12L48 50H42L38.5 41H25.5L22 50H16L32 12ZM32 21L27 35H37L32 21Z" fill="white"/>
+  
+  <!-- Define gradient -->
+  <defs>
+    <linearGradient id="pinkGradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" style="stop-color:#FF69B4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF1493;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

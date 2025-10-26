@@ -1,0 +1,175 @@
+import { useState, useEffect } from 'react';
+import { LoginRegistration } from './components/LoginRegistration';
+import { StudentDashboard } from './components/StudentDashboard';
+import { TeacherDashboard } from './components/TeacherDashboard';
+import { CoursePage } from './components/CoursePage';
+import { AssignmentPage } from './components/AssignmentPage';
+import { GradesPage } from './components/GradesPage';
+import { DiscussionForum } from './components/DiscussionForum';
+import { NotificationsPage } from './components/NotificationsPage';
+import { AdminPanel } from './components/AdminPanel';
+import { Navigation } from './components/Navigation';
+import { MyTeachersPage } from './components/MyTeachersPage';
+import { MyStudentsPage } from './components/MyStudentsPage';
+import { TeacherCoursesPage } from './components/TeacherCoursesPage';
+import { CourseContentViewer } from './components/CourseContentViewer';
+import { ToastProvider } from './components/ui/toast';
+import { useState, useEffect } from 'react';
+
+export type UserRole = 'student' | 'teacher' | 'admin' | null;
+export type Page = 'landing' | 'login' | 'student-dashboard' | 'teacher-dashboard' | 'course' | 'assignment' | 'grades' | 'discussion' | 'notifications' | 'admin' | 'my-teachers' | 'my-students' | 'teacher-courses' | 'course-content';
+
+export default function App() {
+  const [currentPage, setCurrentPage] = useState('login');
+  const [userRole, setUserRole] = useState(null);
+  const [userName, setUserName] = useState(''); // Store user's name
+  const [userEmail, setUserEmail] = useState(''); // Store user's email for data filtering
+  const [selectedCourseId, setSelectedCourseId] = useState('');
+  const [isDark, setIsDark] = useState(false);
+
+  // Load user data from localStorage on app mount
+  useEffect(() => {
+    const storedUserData = localStorage.getItem('userData');
+    if (storedUserData) {
+      try {
+        const userData = JSON.parse(storedUserData);
+        setUserEmail(userData.email || ''); // Load email
+        // Optionally auto-login if user data exists
+        // For now, just keep the data ready
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
+
+  const handleLogin = (role: UserRole, name?: string, email?: string) => {
+    setUserRole(role);
+    
+    // If name or email is not provided, try to get it from localStorage
+    let displayName = name;
+    let userEmailAddress = email;
+    
+    if (!displayName || !userEmailAddress) {
+      const storedUserData = localStorage.getItem('userData');
+      if (storedUserData) {
+        try {
+          const userData = JSON.parse(storedUserData);
+          displayName = displayName || userData.name;
+          userEmailAddress = userEmailAddress || userData.email;
+        } catch (error) {
+          console.error('Error parsing stored user data:', error);
+        }
+      }
+    }
+    
+    setUserName(displayName || 'User'); // Store the name, default to 'User' if not provided
+    setUserEmail(userEmailAddress || ''); // Store the email
+    
+    if (role === 'student') {
+      setCurrentPage('student-dashboard');
+    } else if (role === 'teacher') {
+      setCurrentPage('teacher-dashboard');
+    } else if (role === 'admin') {
+      setCurrentPage('admin');
+    }
+  };
+
+  const handleLogout = () => {
+    setUserRole(null);
+    setUserName(''); // Clear the name on logout
+    setUserEmail(''); // Clear the email on logout
+    // Optionally clear localStorage if you want to remove user data
+    // localStorage.removeItem('userData');
+    setCurrentPage('login');
+  };
+
+  const handleViewCourse = (courseId) => {
+    console.log('🎓 View Course clicked - courseId:', courseId);
+    console.log('🎓 courseId type:', typeof courseId);
+    console.log('🎓 courseId is valid:', !!courseId);
+    
+    if (!courseId) {
+      console.error('❌ Invalid courseId provided to handleViewCourse');
+      return;
+    }
+    
+    setSelectedCourseId(courseId);
+    setCurrentPage('course-content');
+  };
+
+  const handleBackToCourses = () => {
+    setSelectedCourseId('');
+    setCurrentPage('course');
+  };
+
+  const renderPage = () => {
+    // If not logged in, always show login page
+    if (!userRole) {
+      return <LoginRegistration onLogin={handleLogin} />;
+    }
+
+    // After login, show role-based pages
+    switch (currentPage) {
+      case 'student-dashboard':
+        return <StudentDashboard onNavigate={setCurrentPage} userName={userName} userEmail={userEmail} />;
+      case 'teacher-dashboard':
+        return <TeacherDashboard onNavigate={setCurrentPage} userName={userName} userEmail={userEmail} />;
+      case 'my-teachers':
+        return <MyTeachersPage onNavigate={setCurrentPage} userEmail={userEmail} />;
+      case 'my-students':
+        return <MyStudentsPage onNavigate={setCurrentPage} userEmail={userEmail} />;
+      case 'teacher-courses':
+        return <TeacherCoursesPage onNavigate={setCurrentPage} />;
+      case 'course':
+        return <CoursePage onNavigate={setCurrentPage} userRole={userRole} onViewCourse={handleViewCourse} />;
+      case 'course-content':
+        return <CourseContentViewer courseId={selectedCourseId} onBack={handleBackToCourses} />;
+      case 'assignment':
+        return <AssignmentPage onNavigate={setCurrentPage} userRole={userRole} />;
+      case 'grades':
+        return <GradesPage onNavigate={setCurrentPage} />;
+      case 'discussion':
+        return <DiscussionForum onNavigate={setCurrentPage} userRole={userRole} />;
+      case 'notifications':
+        return <NotificationsPage onNavigate={setCurrentPage} />;
+      case 'admin':
+        return <AdminPanel onNavigate={setCurrentPage} />;
+      default:
+        // Default to dashboard based on role
+        if (userRole === 'student') {
+          return <StudentDashboard onNavigate={setCurrentPage} userName={userName} userEmail={userEmail} />;
+        } else if (userRole === 'teacher') {
+          return <TeacherDashboard onNavigate={setCurrentPage} userName={userName} userEmail={userEmail} />;
+        } else {
+          return <AdminPanel onNavigate={setCurrentPage} />;
+        }
+    }
+  };
+
+  return (
+    <ToastProvider>
+      <div className="min-h-screen bg-background">
+        {userRole && (
+          <Navigation
+            userRole={userRole}
+            onNavigate={setCurrentPage}
+            onLogout={handleLogout}
+            currentPage={currentPage}
+            isDark={isDark}
+            onToggleDark={() => setIsDark(!isDark)}
+          />
+        )}
+
+        {renderPage()}
+      </div>
+    </ToastProvider>
+  );
+}

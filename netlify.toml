@@ -1,0 +1,37 @@
+[build]
+  command = "npm run build"
+  publish = "build"
+  base = "/"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Proxy API requests to your Render backend
+[[redirects]]
+  from = "/api/*"
+  to = "https://aarambh01-1.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[functions]
+  directory = "netlify/functions"
+
+[dev]
+  command = "npm run dev"
+  port = 8888
+  targetPort = 5173
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    cache-control = '''
+    max-age=31536000,
+    immutable
+    '''

@@ -1,0 +1,19 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pink gradient background with rounded corners -->
+  <rect width="180" height="180" rx="40" fill="url(#pinkGradient)"/>
+  
+  <!-- Letter 'A' for Aarambh -->
+  <path d="M90 35L135 145H120L108 115H72L60 145H45L90 35ZM90 60L76 100H104L90 60Z" fill="white" stroke="white" stroke-width="2"/>
+  
+  <!-- Small decorative element - book or learning icon -->
+  <circle cx="90" cy="125" r="3" fill="white" opacity="0.6"/>
+  
+  <!-- Define gradient -->
+  <defs>
+    <linearGradient id="pinkGradient" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" style="stop-color:#FF69B4;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FF1493;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>React Debug</title>
+</head>
+<body>
+    <h1>React Application Debug</h1>
+    <div id="root">If you see this text, React hasn't mounted properly</div>
+    
+    <script>
+        // Check if React is loaded
+        console.log('Window object keys:', Object.keys(window));
+        
+        // Check if root element exists
+        const rootElement = document.getElementById('root');
+        console.log('Root element exists:', !!rootElement);
+        
+        if (rootElement) {
+            rootElement.innerHTML = '<p>Root element found. Checking React...</p>';
+            
+            // Try to fetch the main React app
+            fetch('http://localhost:5173/src/main.tsx')
+                .then(response => {
+                    if (response.ok) {
+                        rootElement.innerHTML += '<p>main.tsx loaded successfully</p>';
+                        return response.text();
+                    } else {
+                        rootElement.innerHTML += `<p>Error loading main.tsx: ${response.status}</p>`;
+                    }
+                })
+                .then(text => {
+                    if (text) {
+                        console.log('main.tsx content:', text.substring(0, 200));
+                        rootElement.innerHTML += '<p>main.tsx content loaded</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    rootElement.innerHTML += `<p>Fetch error: ${error.message}</p>`;
+                });
+        } else {
+            document.body.innerHTML += '<p>ERROR: Root element not found!</p>';
+        }
+    </script>
+</body>
+</html>
