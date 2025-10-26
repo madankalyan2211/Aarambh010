@@ -1,20 +1,21 @@
 # Aarambh LMS Deployment Guide
 
-This guide provides instructions for deploying the Aarambh Learning Management System to Render (backend) and AWS (frontend).
+This guide provides instructions for deploying the Aarambh Learning Management System to Render (backend) and AWS Amplify (frontend) using Git-based deployment.
 
 ## Prerequisites
 
 1. Node.js >= 18.0.0
 2. npm or yarn
 3. Git
-4. AWS CLI (for AWS deployment)
+4. GitHub account
 5. Render account (for backend deployment)
+6. AWS account (for frontend deployment)
 
-## Backend Deployment to Render
+## Backend Deployment to Render (Git-based)
 
 ### 1. Prepare Environment Variables
 
-Update the `server/.env.render` file with your actual configuration values:
+Update the `server/.env.production` file with your actual configuration values:
 
 ```bash
 # MongoDB Configuration
@@ -39,129 +40,63 @@ FIREBASE_CLIENT_ID=your_firebase_client_id_here
 FIREBASE_CLIENT_X509_CERT_URL=your_firebase_client_x509_cert_url_here
 ```
 
-### 2. Deploy to Render
+### 2. Deploy to Render via Git
 
 1. Go to [Render Dashboard](https://dashboard.render.com)
 2. Click "New" -> "Web Service"
-3. Connect your GitHub repository
-4. Set the root directory to `server`
+3. Connect your GitHub account
+4. Select your repository: `madankalyan2211/Aarambh010`
 5. Configure the following settings:
-   - Name: `aarambh-backend`
-   - Runtime: Node
-   - Build Command: `npm install`
-   - Start Command: `npm start`
-   - Plan: Free (or choose a paid plan for production)
-6. Add environment variables from `.env.render`
+   - **Name**: `aarambh-backend`
+   - **Root Directory**: `server`
+   - **Runtime**: Node
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Plan**: Free (or choose a paid plan for production)
+6. Add environment variables from `server/.env.production`
 7. Click "Create Web Service"
 
 ### 3. Post-Deployment Configuration
 
 After deployment, update your MongoDB Atlas IP whitelist to include Render's IP addresses.
 
-## Frontend Deployment to AWS
+## Frontend Deployment to AWS Amplify (Git-based)
 
 ### 1. Configure Environment Variables
 
-Update the `.env` file with your production configuration:
+Update the `.env.production` file with your production configuration:
 
 ```bash
-# Firebase Web SDK Configuration (for frontend)
-VITE_FIREBASE_API_KEY=your_firebase_api_key_here
-VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain_here
-VITE_FIREBASE_PROJECT_ID=your_firebase_project_id_here
-VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket_here
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id_here
-VITE_FIREBASE_APP_ID=your_firebase_app_id_here
-
 # Backend API Configuration
-VITE_API_BASE_URL=https://your-backend-url.onrender.com/api
+VITE_API_BASE_URL=https://your-render-backend-url.onrender.com/api
+
+# Application Configuration
+VITE_APP_URL=https://your-aws-amplify-url.amazonaws.com
 ```
 
-### 2. Deploy Using AWS CLI Script
+### 2. Deploy to AWS Amplify via Git
 
-Run the deployment script:
+1. Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify/home)
+2. Click "New app" -> "Host web app"
+3. Connect your Git repository provider (GitHub)
+4. Select your repository: `madankalyan2211/Aarambh010`
+5. Configure build settings:
+   - **App name**: `aarambh-frontend`
+   - **Branch**: `main`
+   - **Build settings**:
+     - Base directory: `/` (root)
+     - Build command: `npm run build`
+     - Artifact directory: `dist`
+6. Add environment variables from `.env.production`
+7. Click "Save and deploy"
 
-```bash
-# Make the script executable
-chmod +x deploy-to-aws.sh
+### 3. Custom Domain (Optional)
 
-# Run the deployment
-./deploy-to-aws.sh --bucket your-bucket-name --region us-east-1
-```
-
-### 3. Manual AWS Deployment Steps
-
-1. **Create S3 Bucket**:
-   ```bash
-   aws s3 mb s3://your-bucket-name --region us-east-1
-   ```
-
-2. **Configure Static Website Hosting**:
-   ```bash
-   aws s3 website s3://your-bucket-name --index-document index.html --error-document index.html
-   ```
-
-3. **Build the Application**:
-   ```bash
-   npm run build
-   ```
-
-4. **Upload Files**:
-   ```bash
-   aws s3 sync dist/ s3://your-bucket-name --delete
-   ```
-
-5. **Set Bucket Policy**:
-   Create a `bucket-policy.json` file:
-   ```json
-   {
-       "Version": "2012-10-17",
-       "Statement": [
-           {
-               "Sid": "PublicReadGetObject",
-               "Effect": "Allow",
-               "Principal": "*",
-               "Action": "s3:GetObject",
-               "Resource": "arn:aws:s3:::your-bucket-name/*"
-           }
-       ]
-   }
-   ```
-   
-   Apply the policy:
-   ```bash
-   aws s3api put-bucket-policy --bucket your-bucket-name --policy file://bucket-policy.json
-   ```
-
-6. **Configure CORS** (optional):
-   Create a `cors.json` file:
-   ```json
-   {
-       "CORSRules": [
-           {
-               "AllowedHeaders": ["*"],
-               "AllowedMethods": ["GET", "HEAD"],
-               "AllowedOrigins": ["*"],
-               "MaxAgeSeconds": 3000
-           }
-       ]
-   }
-   ```
-   
-   Apply CORS configuration:
-   ```bash
-   aws s3api put-bucket-cors --bucket your-bucket-name --cors-configuration file://cors.json
-   ```
-
-### 4. Optional: Create CloudFront Distribution
-
-For HTTPS support and better performance, create a CloudFront distribution:
-
-```bash
-aws cloudfront create-distribution \
-    --origin-domain-name your-bucket-name.s3.amazonaws.com \
-    --default-root-object index.html
-```
+After deployment, you can configure a custom domain in the AWS Amplify console:
+1. Go to your app in the Amplify console
+2. Click "Domain management"
+3. Click "Add domain"
+4. Follow the instructions to add your custom domain
 
 ## Environment Configuration
 
@@ -206,7 +141,7 @@ aws cloudfront create-distribution \
 ### Logs and Monitoring
 
 - Render: Check logs in the Render dashboard
-- AWS: Check CloudWatch logs for S3 and CloudFront
+- AWS Amplify: Check logs in the Amplify console
 - Application: Enable debug logging by setting `DEBUG=*` environment variable
 
 ## Security Considerations
@@ -221,7 +156,7 @@ aws cloudfront create-distribution \
 ## Scaling Considerations
 
 1. **Render**: Upgrade to a paid plan for better performance and reliability
-2. **AWS**: Consider using CloudFront for global content delivery
+2. **AWS Amplify**: Consider using CloudFront for global content delivery
 3. **MongoDB**: Use a dedicated cluster for production workloads
 4. **Email**: Consider using a dedicated email service like SendGrid or AWS SES for production
 
