@@ -1,164 +1,234 @@
 # Aarambh LMS Deployment Guide
 
-This guide will help you deploy the Aarambh Learning Management System to Render (backend) and Vercel (frontend).
+This guide provides instructions for deploying the Aarambh Learning Management System to Render (backend) and AWS (frontend).
 
 ## Prerequisites
 
-1. Accounts:
-   - [Render](https://render.com/) account
-   - [Vercel](https://vercel.com/) account
-   - MongoDB Atlas account (or other MongoDB hosting service)
+1. Node.js >= 18.0.0
+2. npm or yarn
+3. Git
+4. AWS CLI (for AWS deployment)
+5. Render account (for backend deployment)
 
-2. Tools:
-   - Git
-   - Node.js (v16 or higher)
-   - npm or yarn
+## Backend Deployment to Render
 
-## Backend Deployment (Render)
+### 1. Prepare Environment Variables
 
-### 1. Prepare Your Repository
+Update the `server/.env.render` file with your actual configuration values:
 
-Make sure your code is pushed to a Git repository (GitHub, GitLab, or Bitbucket).
+```bash
+# MongoDB Configuration
+MONGODB_URI=your_mongodb_atlas_connection_string_here
 
-### 2. Create a New Web Service on Render
+# JWT Configuration
+JWT_SECRET=your_secure_jwt_secret_here
 
-1. Go to [Render Dashboard](https://dashboard.render.com/)
-2. Click "New" → "Web Service"
-3. Connect your Git repository
-4. Configure the service:
-   - **Name**: aarambh-backend
-   - **Environment**: Node
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Branch**: main (or your default branch)
+# Email Configuration (Gmail)
+GMAIL_USER=your_gmail_address_here
+GMAIL_APP_PASSWORD=your_gmail_app_password_here
 
-### 3. Configure Environment Variables
+# Google OAuth Configuration
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 
-In the Render dashboard, go to your service settings and add these environment variables:
-
-| Key | Value (Description) |
-|-----|---------------------|
-| `NODE_ENV` | `production` |
-| `PORT` | `3001` |
-| `MONGODB_URI` | Your MongoDB connection string |
-| `JWT_SECRET` | A strong secret key for JWT tokens |
-| `GMAIL_USER` | Your Gmail address for sending emails |
-| `GMAIL_APP_PASSWORD` | Your Gmail app password |
-| `GMAIL_FROM_NAME` | `Aarambh LMS` |
-| `SMTP_HOST` | `smtp.gmail.com` |
-| `SMTP_PORT` | `587` |
-| `SMTP_SECURE` | `false` |
-| `OTP_EXPIRY_MINUTES` | `10` |
-| `OTP_LENGTH` | `6` |
-| `OTP_MAX_ATTEMPTS` | `3` |
-| `ALLOWED_ORIGINS` | Your frontend URL (e.g., `https://your-app.vercel.app`) |
-| `API_SECRET_KEY` | A strong secret key for API security |
-| `GEMINI_API_KEY` | Your Gemini API key (optional) |
-| `GROQ_API_KEY` | Your Groq API key (optional) |
-
-### 4. Deploy
-
-Click "Create Web Service" and wait for the deployment to complete.
-
-Note the URL of your deployed backend (e.g., `https://aarambh-backend.onrender.com`).
-
-## Frontend Deployment (Vercel)
-
-### 1. Update Environment Variables
-
-Before deploying to Vercel, update the [.env.production](file:///Users/madanthambisetty/Downloads/Aarambh/.env.production) file with your actual backend URL:
-
-```
-VITE_API_BASE_URL=https://your-render-app-url.onrender.com/api
-VITE_APP_URL=https://your-vercel-app.vercel.app
+# Firebase Admin SDK Configuration
+FIREBASE_PRIVATE_KEY_ID=your_private_key_id_here
+FIREBASE_PRIVATE_KEY=your_private_key_here
+FIREBASE_CLIENT_EMAIL=your_firebase_client_email_here
+FIREBASE_CLIENT_ID=your_firebase_client_id_here
+FIREBASE_CLIENT_X509_CERT_URL=your_firebase_client_x509_cert_url_here
 ```
 
-### 2. Deploy to Vercel
+### 2. Deploy to Render
 
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Click "New Project"
-3. Import your Git repository
-4. Configure the project:
-   - **Framework Preset**: `Vite`
-   - **Root Directory**: `/` (root of your repository)
-   - **Build and Output Settings**:
-     - Build Command: `npm run build`
-     - Output Directory: `dist`
-     - Install Command: `npm install`
+1. Go to [Render Dashboard](https://dashboard.render.com)
+2. Click "New" -> "Web Service"
+3. Connect your GitHub repository
+4. Set the root directory to `server`
+5. Configure the following settings:
+   - Name: `aarambh-backend`
+   - Runtime: Node
+   - Build Command: `npm install`
+   - Start Command: `npm start`
+   - Plan: Free (or choose a paid plan for production)
+6. Add environment variables from `.env.render`
+7. Click "Create Web Service"
 
-### 3. Configure Environment Variables
+### 3. Post-Deployment Configuration
 
-In the Vercel dashboard, go to your project settings and add these environment variables:
+After deployment, update your MongoDB Atlas IP whitelist to include Render's IP addresses.
 
-| Key | Value (Description) |
-|-----|---------------------|
-| `VITE_API_BASE_URL` | Your Render backend URL (e.g., `https://aarambh-backend.onrender.com/api`) |
-| `VITE_APP_ENV` | `production` |
-| `VITE_DEBUG_MODE` | `false` |
-| `VITE_APP_URL` | Your Vercel app URL |
+## Frontend Deployment to AWS
 
-### 4. Deploy
+### 1. Configure Environment Variables
 
-Click "Deploy" and wait for the deployment to complete.
+Update the `.env` file with your production configuration:
 
-## Post-Deployment Configuration
+```bash
+# Firebase Web SDK Configuration (for frontend)
+VITE_FIREBASE_API_KEY=your_firebase_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain_here
+VITE_FIREBASE_PROJECT_ID=your_firebase_project_id_here
+VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket_here
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id_here
+VITE_FIREBASE_APP_ID=your_firebase_app_id_here
 
-### 1. Update CORS Settings
-
-After deploying both frontend and backend, update the `ALLOWED_ORIGINS` environment variable in Render with your Vercel app URL:
-
+# Backend API Configuration
+VITE_API_BASE_URL=https://your-backend-url.onrender.com/api
 ```
-ALLOWED_ORIGINS=https://your-vercel-app.vercel.app,https://your-render-app.onrender.com
+
+### 2. Deploy Using AWS CLI Script
+
+Run the deployment script:
+
+```bash
+# Make the script executable
+chmod +x deploy-to-aws.sh
+
+# Run the deployment
+./deploy-to-aws.sh --bucket your-bucket-name --region us-east-1
 ```
 
-### 2. Test the Deployment
+### 3. Manual AWS Deployment Steps
 
-1. Visit your frontend URL
-2. Try to register a new user
-3. Check if emails are being sent
-4. Verify that you can log in with the OTP
+1. **Create S3 Bucket**:
+   ```bash
+   aws s3 mb s3://your-bucket-name --region us-east-1
+   ```
+
+2. **Configure Static Website Hosting**:
+   ```bash
+   aws s3 website s3://your-bucket-name --index-document index.html --error-document index.html
+   ```
+
+3. **Build the Application**:
+   ```bash
+   npm run build
+   ```
+
+4. **Upload Files**:
+   ```bash
+   aws s3 sync dist/ s3://your-bucket-name --delete
+   ```
+
+5. **Set Bucket Policy**:
+   Create a `bucket-policy.json` file:
+   ```json
+   {
+       "Version": "2012-10-17",
+       "Statement": [
+           {
+               "Sid": "PublicReadGetObject",
+               "Effect": "Allow",
+               "Principal": "*",
+               "Action": "s3:GetObject",
+               "Resource": "arn:aws:s3:::your-bucket-name/*"
+           }
+       ]
+   }
+   ```
+   
+   Apply the policy:
+   ```bash
+   aws s3api put-bucket-policy --bucket your-bucket-name --policy file://bucket-policy.json
+   ```
+
+6. **Configure CORS** (optional):
+   Create a `cors.json` file:
+   ```json
+   {
+       "CORSRules": [
+           {
+               "AllowedHeaders": ["*"],
+               "AllowedMethods": ["GET", "HEAD"],
+               "AllowedOrigins": ["*"],
+               "MaxAgeSeconds": 3000
+           }
+       ]
+   }
+   ```
+   
+   Apply CORS configuration:
+   ```bash
+   aws s3api put-bucket-cors --bucket your-bucket-name --cors-configuration file://cors.json
+   ```
+
+### 4. Optional: Create CloudFront Distribution
+
+For HTTPS support and better performance, create a CloudFront distribution:
+
+```bash
+aws cloudfront create-distribution \
+    --origin-domain-name your-bucket-name.s3.amazonaws.com \
+    --default-root-object index.html
+```
+
+## Environment Configuration
+
+### Backend Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NODE_ENV` | Environment (production/development) | Yes |
+| `PORT` | Server port | Yes |
+| `MONGODB_URI` | MongoDB connection string | Yes |
+| `JWT_SECRET` | Secret for JWT token generation | Yes |
+| `GMAIL_USER` | Gmail address for sending emails | Yes |
+| `GMAIL_APP_PASSWORD` | Gmail app password | Yes |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | Yes |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | Yes |
+| `FIREBASE_*` | Firebase Admin SDK credentials | Yes |
+
+### Frontend Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VITE_FIREBASE_API_KEY` | Firebase Web SDK API key | Yes |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Firebase auth domain | Yes |
+| `VITE_FIREBASE_PROJECT_ID` | Firebase project ID | Yes |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket | Yes |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID | Yes |
+| `VITE_FIREBASE_APP_ID` | Firebase app ID | Yes |
+| `VITE_API_BASE_URL` | Backend API base URL | Yes |
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **CORS Errors**: Make sure `ALLOWED_ORIGINS` includes your frontend URL
-2. **Email Not Sending**: Verify your Gmail credentials and app password
-3. **Database Connection**: Check your MongoDB URI and network access
-4. **Environment Variables**: Ensure all required environment variables are set
+1. **CORS Errors**: Ensure your backend CORS configuration allows requests from your frontend domain.
+
+2. **MongoDB Connection Issues**: Verify your MongoDB Atlas IP whitelist includes your deployment environment IPs.
+
+3. **Firebase Authentication Issues**: Check that all Firebase configuration variables are correctly set.
+
+4. **Email Sending Issues**: Ensure your Gmail app password is correctly configured.
 
 ### Logs and Monitoring
 
-- Check Render logs for backend issues
-- Check Vercel logs for frontend issues
-- Monitor MongoDB Atlas for database connection issues
-
-## Updating Your Deployment
-
-To update your deployed application:
-
-1. Push changes to your Git repository
-2. Render will automatically redeploy the backend
-3. Vercel will automatically redeploy the frontend
-
-For manual deployment:
-- Render: Go to your service dashboard and click "Manual Deploy"
-- Vercel: Go to your project dashboard and click "Redeploy"
+- Render: Check logs in the Render dashboard
+- AWS: Check CloudWatch logs for S3 and CloudFront
+- Application: Enable debug logging by setting `DEBUG=*` environment variable
 
 ## Security Considerations
 
-1. Never commit sensitive information like API keys to version control
-2. Use strong, unique passwords for all services
-3. Regularly rotate your API keys and secrets
-4. Enable two-factor authentication on all accounts
-5. Use HTTPS for all communications
+1. Never commit sensitive credentials to version control
+2. Use environment variables for all secrets
+3. Rotate JWT secrets regularly
+4. Use strong, unique passwords for all services
+5. Enable two-factor authentication where possible
 6. Regularly update dependencies to patch security vulnerabilities
 
-## Support
+## Scaling Considerations
 
-If you encounter issues with deployment, check the documentation for:
-- [Render Documentation](https://render.com/docs)
-- [Vercel Documentation](https://vercel.com/docs)
-- [MongoDB Atlas Documentation](https://docs.atlas.mongodb.com/)
+1. **Render**: Upgrade to a paid plan for better performance and reliability
+2. **AWS**: Consider using CloudFront for global content delivery
+3. **MongoDB**: Use a dedicated cluster for production workloads
+4. **Email**: Consider using a dedicated email service like SendGrid or AWS SES for production
 
-For Aarambh-specific issues, please open an issue on the GitHub repository.
+## Maintenance
+
+1. Regularly backup your MongoDB database
+2. Monitor application logs for errors
+3. Update dependencies regularly
+4. Review and rotate API keys and secrets periodically
+5. Monitor usage and costs on Render and AWS

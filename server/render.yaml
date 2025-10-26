@@ -9,7 +9,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        fromValue: PORT
+        value: 3002
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
