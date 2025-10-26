@@ -13,8 +13,13 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "https://aarambh010.onrender.com/api/$1",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+    },
+    {
       "src": "/(.*)",
-      "dest": "/dist/index.html"
+      "dest": "/index.html"
     }
   ],
   "buildCommand": "npm run build",
