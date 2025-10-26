@@ -18,6 +18,14 @@
       "methods": ["GET", "POST", "PUT", "DELETE", "PATCH"]
     },
     {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*)\\.(.*)",
+      "dest": "/$1.$2"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
