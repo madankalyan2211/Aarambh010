@@ -227,6 +227,7 @@ app.get('/', (req, res) => {
       verifyOTP: 'POST /api/auth/verify-otp',
       resendOTP: 'POST /api/auth/resend-otp',
       sendWelcome: 'POST /api/auth/send-welcome',
+      firebaseCallback: 'POST /api/auth/firebase/callback',
       googleLogin: 'GET /api/google/auth/google',
       googleCallback: 'GET /api/google/auth/google/callback',
     },
