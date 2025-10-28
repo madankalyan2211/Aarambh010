@@ -190,6 +190,48 @@ router.post('/check-user', async (req, res) => {
   }
 });
 
+// Test Firebase configuration
+router.get('/test-firebase-config', async (req, res) => {
+  try {
+    // Check if required environment variables are present
+    const requiredEnvVars = [
+      'FIREBASE_PROJECT_ID', 
+      'FIREBASE_CLIENT_EMAIL', 
+      'FIREBASE_PRIVATE_KEY'
+    ];
+    
+    const envStatus = {};
+    let allPresent = true;
+    
+    requiredEnvVars.forEach(envVar => {
+      envStatus[envVar] = {
+        present: !!process.env[envVar],
+        value: process.env[envVar] ? 
+          (envVar === 'FIREBASE_PRIVATE_KEY' ? '[PRIVATE_KEY_HIDDEN]' : process.env[envVar].substring(0, 50) + '...') : 
+          null
+      };
+      
+      if (!process.env[envVar]) {
+        allPresent = false;
+      }
+    });
+    
+    res.status(200).json({
+      success: true,
+      message: 'Firebase configuration status',
+      allVariablesPresent: allPresent,
+      environmentVariables: envStatus
+    });
+  } catch (error) {
+    console.error('Firebase config test error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error testing Firebase configuration',
+      error: error.message
+    });
+  }
+});
+
 // Firebase authentication callback
 router.post('/firebase/callback', async (req, res) => {
   try {
@@ -203,6 +245,19 @@ router.post('/firebase/callback', async (req, res) => {
     // Initialize Firebase Admin SDK if not already initialized
     if (!admin.apps.length) {
       console.log('Initializing Firebase Admin SDK');
+      // Check if required environment variables are present
+      const requiredEnvVars = ['FIREBASE_PROJECT_ID', 'FIREBASE_CLIENT_EMAIL', 'FIREBASE_PRIVATE_KEY'];
+      const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+      
+      if (missingEnvVars.length > 0) {
+        console.error('Missing Firebase environment variables:', missingEnvVars);
+        return res.status(500).json({
+          success: false,
+          message: 'Firebase configuration error: missing environment variables',
+          missingVariables: missingEnvVars
+        });
+      }
+      
       admin.initializeApp({
         credential: admin.credential.cert({
           projectId: process.env.FIREBASE_PROJECT_ID,
