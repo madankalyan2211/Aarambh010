@@ -337,6 +337,9 @@ server.listen(PORT, () => {
   console.log('');
   console.log('✨ Ready to send OTP emails!');
   console.log('');
+  
+  // Log route registration status
+  console.log('✅ Server startup completed successfully');
 });
 
 // Handle server errors
@@ -346,6 +349,25 @@ server.on('error', (error) => {
     console.error(`Port ${PORT} is already in use. Please use a different port.`);
     process.exit(1);
   }
+});
+
+// Log when the process starts
+console.log('🔄 Server process starting...');
+
+// Log when the process exits
+process.on('exit', (code) => {
+  console.log(`🔄 Server process exiting with code: ${code}`);
+});
+
+// Log uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught exception:', error);
+  console.error('Error stack:', error.stack);
+});
+
+// Log unhandled rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled rejection at:', promise, 'reason:', reason);
 });
 
 module.exports = app;
