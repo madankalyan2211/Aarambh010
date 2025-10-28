@@ -17,7 +17,8 @@
     "test-docker": "node test-docker.js",
     "validate-firebase": "node validate-firebase-config.js",
     "test-firebase": "node test-firebase-auth.js",
-    "test-server": "node test-server.js"
+    "test-server": "node test-server.js",
+    "test-firebase-init": "node test-firebase-init.js"
   },
   "keywords": [
     "email",
