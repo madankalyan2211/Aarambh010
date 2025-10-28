@@ -209,6 +209,37 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Environment variables check endpoint
+app.get('/env-check', (req, res) => {
+  const requiredEnvVars = [
+    'FIREBASE_PROJECT_ID',
+    'FIREBASE_CLIENT_EMAIL',
+    'FIREBASE_PRIVATE_KEY'
+  ];
+  
+  const envStatus = {};
+  let allPresent = true;
+  
+  requiredEnvVars.forEach(envVar => {
+    const isPresent = !!process.env[envVar];
+    envStatus[envVar] = {
+      present: isPresent,
+      value: isPresent ? '[REDACTED]' : null
+    };
+    
+    if (!isPresent) {
+      allPresent = false;
+    }
+  });
+  
+  res.status(200).json({
+    success: true,
+    message: 'Environment variables check',
+    allRequiredVariablesPresent: allPresent,
+    environmentVariables: envStatus
+  });
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
