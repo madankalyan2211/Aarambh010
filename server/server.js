@@ -199,16 +199,22 @@ app.use('/api/rss', rssRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  const mongoose = require('mongoose');
-  const mongodbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
-  
   res.status(200).json({
     success: true,
     message: 'Server is running',
     timestamp: new Date().toISOString(),
-    mongodbStatus: mongodbStatus,
+    mongodbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     uptime: process.uptime(),
-    auth0Enabled: useAuth0,
+  });
+});
+
+// Simple test endpoint to verify deployment
+app.get('/test-deployment', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Deployment test endpoint working',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
   });
 });
 
