@@ -120,7 +120,8 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS
   'https://aarambh-git-main-madantambisetty.vercel.app',
   'https://aarambh.vercel.app',
   'https://main.du547ljv1ya6v.amplifyapp.com',
-  'https://aarambh-production.eba-hmkpyyve.us-east-1.elasticbeanstalk.com'
+  'https://aarambh-production.eba-hmkpyyve.us-east-1.elasticbeanstalk.com',
+  'https://aarambh-01.web.app' // Add Firebase Hosting domain
 ];
 
 app.use(cors({
@@ -136,7 +137,8 @@ app.use(cors({
         origin?.startsWith('https://127.0.0.1:') ||
         origin?.endsWith('.vercel.app') ||
         origin?.endsWith('.netlify.app') ||
-        origin?.endsWith('.amplifyapp.com')) {
+        origin?.endsWith('.amplifyapp.com') ||
+        origin?.endsWith('.web.app')) { // Allow all Firebase Hosting domains
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -206,37 +208,6 @@ app.get('/health', (req, res) => {
     mongodbStatus: mongodbStatus,
     uptime: process.uptime(),
     auth0Enabled: useAuth0,
-  });
-});
-
-// Environment variables check endpoint
-app.get('/env-check', (req, res) => {
-  const requiredEnvVars = [
-    'FIREBASE_PROJECT_ID',
-    'FIREBASE_CLIENT_EMAIL',
-    'FIREBASE_PRIVATE_KEY'
-  ];
-  
-  const envStatus = {};
-  let allPresent = true;
-  
-  requiredEnvVars.forEach(envVar => {
-    const isPresent = !!process.env[envVar];
-    envStatus[envVar] = {
-      present: isPresent,
-      value: isPresent ? '[REDACTED]' : null
-    };
-    
-    if (!isPresent) {
-      allPresent = false;
-    }
-  });
-  
-  res.status(200).json({
-    success: true,
-    message: 'Environment variables check',
-    allRequiredVariablesPresent: allPresent,
-    environmentVariables: envStatus
   });
 });
 
@@ -337,9 +308,6 @@ server.listen(PORT, () => {
   console.log('');
   console.log('✨ Ready to send OTP emails!');
   console.log('');
-  
-  // Log route registration status
-  console.log('✅ Server startup completed successfully');
 });
 
 // Handle server errors
@@ -349,25 +317,6 @@ server.on('error', (error) => {
     console.error(`Port ${PORT} is already in use. Please use a different port.`);
     process.exit(1);
   }
-});
-
-// Log when the process starts
-console.log('🔄 Server process starting...');
-
-// Log when the process exits
-process.on('exit', (code) => {
-  console.log(`🔄 Server process exiting with code: ${code}`);
-});
-
-// Log uncaught exceptions
-process.on('uncaughtException', (error) => {
-  console.error('❌ Uncaught exception:', error);
-  console.error('Error stack:', error.stack);
-});
-
-// Log unhandled rejections
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Unhandled rejection at:', promise, 'reason:', reason);
 });
 
 module.exports = app;
