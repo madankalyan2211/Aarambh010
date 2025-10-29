@@ -277,6 +277,37 @@ app.get('/diagnostics/routes', (req, res) => {
   });
 });
 
+// Diagnostic endpoint to check Firebase environment variables
+app.get('/diagnostics/firebase-env', (req, res) => {
+  const requiredEnvVars = [
+    'FIREBASE_PROJECT_ID',
+    'FIREBASE_CLIENT_EMAIL', 
+    'FIREBASE_PRIVATE_KEY'
+  ];
+  
+  const envStatus = {};
+  let allPresent = true;
+  
+  requiredEnvVars.forEach(envVar => {
+    const isPresent = !!process.env[envVar];
+    envStatus[envVar] = {
+      present: isPresent,
+      value: isPresent ? '[REDACTED]' : null
+    };
+    
+    if (!isPresent) {
+      allPresent = false;
+    }
+  });
+  
+  res.status(200).json({
+    success: true,
+    message: 'Firebase environment check',
+    allVariablesPresent: allPresent,
+    environmentVariables: envStatus
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err);
