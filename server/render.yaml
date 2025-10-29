@@ -1,3 +1,6 @@
+# Aarambh Backend - Force Redeployment 2025-10-29
+# This comment is added to trigger a redeployment
+
 services:
   - type: web
     name: aarambh-backend
