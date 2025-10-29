@@ -465,6 +465,28 @@ app.use((req, res) => {
   });
 });
 
+// Add startup logging
+console.log('🔄 Server process starting...');
+console.log('Environment variables check:');
+console.log('  NODE_ENV:', process.env.NODE_ENV || 'not set');
+console.log('  PORT:', process.env.PORT || 'not set');
+
+// Log when the process exits
+process.on('exit', (code) => {
+  console.log(`🔄 Server process exiting with code: ${code}`);
+});
+
+// Log uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught exception:', error);
+  console.error('Error stack:', error.stack);
+});
+
+// Log unhandled rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled rejection at:', promise, 'reason:', reason);
+});
+
 // Start server
 server.listen(PORT, () => {
   console.log('');
@@ -500,6 +522,9 @@ server.listen(PORT, () => {
   console.log('');
   console.log('✨ Ready to send OTP emails!');
   console.log('');
+  
+  // Log route registration status
+  console.log('✅ Server startup completed successfully');
 });
 
 // Handle server errors
