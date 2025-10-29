@@ -215,6 +215,7 @@ app.get('/test-deployment', (req, res) => {
     message: 'Deployment test endpoint working',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
+    uptime: process.uptime(),
   });
 });
 
@@ -258,6 +259,16 @@ app.get('/test-route-registration', (req, res) => {
     firebaseCallbackRouteRegistered: !!firebaseCallbackRoute,
     totalAuthRoutes: authRoutesList.length,
     authRoutes: authRoutesList.map(route => `${route.method} ${route.path}`)
+  });
+});
+
+// Force redeployment endpoint
+app.get('/force-redeploy', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Force redeploy endpoint',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
   });
 });
 
