@@ -308,6 +308,126 @@ app.get('/diagnostics/firebase-env', (req, res) => {
   });
 });
 
+// Comprehensive diagnostic endpoint
+app.get('/diagnostics/comprehensive', async (req, res) => {
+  try {
+    const diagnostics = {
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      serverStatus: 'running',
+      routes: {}
+    };
+    
+    // Check environment variables
+    const requiredEnvVars = [
+      'FIREBASE_PROJECT_ID',
+      'FIREBASE_CLIENT_EMAIL', 
+      'FIREBASE_PRIVATE_KEY',
+      'MONGODB_URI',
+      'JWT_SECRET'
+    ];
+    
+    diagnostics.environmentVariables = {};
+    let allEnvVarsPresent = true;
+    requiredEnvVars.forEach(envVar => {
+      const isPresent = !!process.env[envVar];
+      diagnostics.environmentVariables[envVar] = isPresent ? '✅ Present' : '❌ Missing';
+      if (!isPresent) allEnvVarsPresent = false;
+    });
+    
+    // Check Firebase Admin SDK
+    try {
+      const admin = require('firebase-admin');
+      diagnostics.firebaseAdminSDK = '✅ Available';
+      
+      if (!admin.apps.length) {
+        try {
+          admin.initializeApp({
+            credential: admin.credential.cert({
+              projectId: process.env.FIREBASE_PROJECT_ID,
+              clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+              privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+            })
+          });
+          diagnostics.firebaseInitialization = '✅ Initialized successfully';
+        } catch (initError) {
+          diagnostics.firebaseInitialization = `❌ Initialization failed: ${initError.message}`;
+        }
+      } else {
+        diagnostics.firebaseInitialization = '✅ Already initialized';
+      }
+    } catch (error) {
+      diagnostics.firebaseAdminSDK = `❌ Not available: ${error.message}`;
+    }
+    
+    // Check database connection
+    try {
+      const mongoose = require('mongoose');
+      diagnostics.databaseConnection = mongoose.connection.readyState === 1 ? '✅ Connected' : '⚠️ Not connected';
+    } catch (error) {
+      diagnostics.databaseConnection = `❌ Error: ${error.message}`;
+    }
+    
+    // Check route registration
+    try {
+      // Function to extract all routes
+      function getRoutes(stack, prefix = '') {
+        const routes = [];
+        
+        stack.forEach(layer => {
+          if (layer.route) {
+            // This is a route
+            const path = prefix + layer.route.path;
+            Object.keys(layer.route.methods).forEach(method => {
+              routes.push({
+                method: method.toUpperCase(),
+                path: path
+              });
+            });
+          } else if (layer.name === 'router' && layer.handle.stack) {
+            // This is a sub-router
+            const subPrefix = prefix + (layer.mountPath || '');
+            routes.push(...getRoutes(layer.handle.stack, subPrefix));
+          }
+        });
+        
+        return routes;
+      }
+
+      // Extract all routes
+      const authRoutesList = getRoutes(authRoutes.stack, '/api/auth');
+      const googleRoutesList = getRoutes(googleRoutes.stack, '/api/google');
+      
+      diagnostics.routes.auth = authRoutesList.length;
+      diagnostics.routes.google = googleRoutesList.length;
+      
+      // Check specifically for Firebase callback route
+      const firebaseCallbackRoute = authRoutesList.find(route => 
+        route.path === '/api/auth/firebase/callback' && route.method === 'POST'
+      );
+      
+      diagnostics.routes.firebaseCallback = firebaseCallbackRoute ? '✅ Registered' : '❌ Not registered';
+      
+    } catch (error) {
+      diagnostics.routes.error = error.message;
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: 'Comprehensive diagnostics completed',
+      diagnostics: diagnostics
+    });
+    
+  } catch (error) {
+    console.error('Diagnostics error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error running diagnostics',
+      error: error.message
+    });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err);
