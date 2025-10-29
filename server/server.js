@@ -236,6 +236,47 @@ app.get('/', (req, res) => {
   });
 });
 
+// Diagnostic endpoint to check route registration
+app.get('/diagnostics/routes', (req, res) => {
+  // Function to extract all routes
+  function getRoutes(stack, prefix = '') {
+    const routes = [];
+    
+    stack.forEach(layer => {
+      if (layer.route) {
+        // This is a route
+        const path = prefix + layer.route.path;
+        Object.keys(layer.route.methods).forEach(method => {
+          routes.push({
+            method: method.toUpperCase(),
+            path: path
+          });
+        });
+      } else if (layer.name === 'router' && layer.handle.stack) {
+        // This is a sub-router
+        const subPrefix = prefix + (layer.mountPath || '');
+        routes.push(...getRoutes(layer.handle.stack, subPrefix));
+      }
+    });
+    
+    return routes;
+  }
+
+  // Extract all routes
+  const authRoutesList = getRoutes(authRoutes.stack, '/api/auth');
+  const googleRoutesList = getRoutes(googleRoutes.stack, '/api/google');
+
+  res.json({
+    success: true,
+    message: 'Route diagnostics',
+    authRoutes: authRoutesList,
+    googleRoutes: googleRoutesList,
+    firebaseCallbackRoute: authRoutesList.find(route => 
+      route.path === '/api/auth/firebase/callback' && route.method === 'POST'
+    )
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err);
