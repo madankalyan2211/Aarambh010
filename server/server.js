@@ -1,5 +1,6 @@
 // Aarambh LMS Backend Server - Force Redeployment 2025-10-29
 // This is a significant change to force a redeployment
+// Version: 2.0.0
 
 const express = require('express');
 const cors = require('cors');
@@ -279,7 +280,7 @@ app.get('/', (req, res) => {
   res.json({
     success: true,
     message: 'Aarambh LMS API Server - Updated 2025-10-29',
-    version: '1.0.0',
+    version: '2.0.0',
     auth0Enabled: useAuth0,
     endpoints: {
       health: '/health',
