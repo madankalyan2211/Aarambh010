@@ -1,4 +1,6 @@
 // Aarambh LMS Backend Server - Force Redeployment 2025-10-29
+// This is a significant change to force a redeployment
+
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
@@ -303,6 +305,16 @@ app.post('/api/auth/firebase/callback/test', (req, res) => {
     success: true,
     message: 'Firebase callback test endpoint working',
     timestamp: new Date().toISOString(),
+  });
+});
+
+// Force redeployment endpoint v2
+app.get('/force-redeploy-v2', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Force redeploy endpoint v2',
+    timestamp: new Date().toISOString(),
+    version: '2.0.0',
   });
 });
 
