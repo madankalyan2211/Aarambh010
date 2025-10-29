@@ -276,7 +276,7 @@ app.get('/force-redeploy', (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     success: true,
-    message: 'Aarambh LMS API Server',
+    message: 'Aarambh LMS API Server - Updated 2025-10-29',
     version: '1.0.0',
     auth0Enabled: useAuth0,
     endpoints: {
