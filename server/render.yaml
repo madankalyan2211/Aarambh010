@@ -1,5 +1,6 @@
 # Aarambh Backend - Force Redeployment 2025-10-29
 # This comment is added to trigger a redeployment
+# Version: 2.0.0
 
 services:
   - type: web
