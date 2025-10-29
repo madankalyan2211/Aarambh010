@@ -297,6 +297,15 @@ app.get('/', (req, res) => {
   });
 });
 
+// Firebase callback test endpoint
+app.post('/api/auth/firebase/callback/test', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Firebase callback test endpoint working',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Diagnostic endpoint to check route registration
 app.get('/diagnostics/routes', (req, res) => {
   // Function to extract all routes
