@@ -1,7 +1,7 @@
 {
   "name": "aarambh-lms-backend",
   "version": "1.0.0",
-  "description": "Backend for Aarambh LMS",
+  "description": "Backend for Aarambh LMS - Force Redeployment 2025-10-29",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
