@@ -218,6 +218,49 @@ app.get('/test-deployment', (req, res) => {
   });
 });
 
+// Route registration test endpoint
+app.get('/test-route-registration', (req, res) => {
+  // Function to extract all routes
+  function getRoutes(stack, prefix = '') {
+    const routes = [];
+    
+    stack.forEach(layer => {
+      if (layer.route) {
+        // This is a route
+        const path = prefix + layer.route.path;
+        Object.keys(layer.route.methods).forEach(method => {
+          routes.push({
+            method: method.toUpperCase(),
+            path: path
+          });
+        });
+      } else if (layer.name === 'router' && layer.handle.stack) {
+        // This is a sub-router
+        const subPrefix = prefix + (layer.mountPath || '');
+        routes.push(...getRoutes(layer.handle.stack, subPrefix));
+      }
+    });
+    
+    return routes;
+  }
+
+  // Extract all routes
+  const authRoutesList = getRoutes(authRoutes.stack, '/api/auth');
+  
+  // Check specifically for Firebase callback route
+  const firebaseCallbackRoute = authRoutesList.find(route => 
+    route.path === '/api/auth/firebase/callback' && route.method === 'POST'
+  );
+
+  res.json({
+    success: true,
+    message: 'Route registration test',
+    firebaseCallbackRouteRegistered: !!firebaseCallbackRoute,
+    totalAuthRoutes: authRoutesList.length,
+    authRoutes: authRoutesList.map(route => `${route.method} ${route.path}`)
+  });
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
